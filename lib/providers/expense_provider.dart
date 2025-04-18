@@ -115,17 +115,11 @@ class ExpenseProvider with ChangeNotifier {
       final now = DateTime.now();
       final currentMonthExpenses =
           _expenses.where((e) {
-            debugPrint(
-              'Checking: ${e.date} => month: ${e.date.month}, year: ${e.date.year}',
-            );
             return e.date.month == now.month && e.date.year == now.year;
           }).toList();
 
       final total = currentMonthExpenses.fold(0.0, (sum, e) => sum + e.amount);
 
-      debugPrint(
-        'Monthly Spent: $total from ${currentMonthExpenses.length} expenses',
-      );
       return total;
     } catch (e, stack) {
       debugPrint('Error in monthlySpent: $e\n$stack');

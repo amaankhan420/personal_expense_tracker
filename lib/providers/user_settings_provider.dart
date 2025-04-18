@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../data/shared_pref/user_settings.dart';
 
-class ThemeProvider extends ChangeNotifier {
+class UserSettingsProvider extends ChangeNotifier {
   bool _isDarkMode = false;
 
   bool get isDarkMode => _isDarkMode;
 
   ThemeMode get currentTheme => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
-  ThemeProvider() {
+  UserSettingsProvider() {
     _loadThemePreference();
   }
 

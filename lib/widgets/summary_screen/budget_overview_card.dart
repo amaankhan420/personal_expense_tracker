@@ -78,21 +78,41 @@ class BudgetOverviewCard extends StatelessWidget {
     required Color defaultColor,
   }) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Icon(icon, size: 20, color: Theme.of(context).iconTheme.color),
-            const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontSize: 16)),
-          ],
+        Flexible(
+          flex: 6,
+          child: Row(
+            children: [
+              Icon(icon, size: 20, color: Theme.of(context).iconTheme.color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: valueColor ?? defaultColor,
+        const SizedBox(width: 8),
+        Flexible(
+          flex: 4,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            reverse: true,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: valueColor ?? defaultColor,
+              ),
+              softWrap: false,
+              overflow: TextOverflow.visible,
+            ),
           ),
         ),
       ],

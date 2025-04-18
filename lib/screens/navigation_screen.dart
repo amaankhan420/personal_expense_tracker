@@ -20,7 +20,7 @@ class NavigationScreenState extends State<NavigationScreen> {
   void initState() {
     super.initState();
     Provider.of<ExpenseProvider>(context, listen: false).fetchExpenses();
-    Provider.of<BudgetProvider>(context, listen: false).fetchBudget();
+    Provider.of<BudgetProvider>(context, listen: false).fetchAllSettings();
   }
 
   int _selectedIndex = 0;

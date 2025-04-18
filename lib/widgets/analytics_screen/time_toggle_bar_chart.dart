@@ -15,25 +15,31 @@ class TimeToggleBarChart extends StatelessWidget {
     required this.groupedData,
   });
 
+  String _formatNumber(double value) {
+    if (value >= 1000000) return '${(value / 1000000).toStringAsFixed(1)}M';
+    if (value >= 1000) return '${(value / 1000).toStringAsFixed(0)}K';
+    return value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 1);
+  }
+
   double _getMaxY(Map<String, double> data) {
     if (data.isEmpty) return 10;
     final maxVal = data.values.reduce((a, b) => a > b ? a : b);
 
-    final magnitude = (maxVal ~/ 10000) * 10000;
-    int base = 10000;
-    if (magnitude >= 100000) {
-      base = 100000;
-    } else if (magnitude >= 10000) {
-      base = 10000;
-    } else if (magnitude >= 1000) {
-      base = 1000;
+    if (maxVal < 100) {
+      return ((maxVal / 10).ceil() * 10).toDouble();
+    } else if (maxVal < 1000) {
+      return ((maxVal / 100).ceil() * 100).toDouble();
+    } else if (maxVal < 10000) {
+      return ((maxVal / 1000).ceil() * 1000).toDouble();
+    } else {
+      return ((maxVal / 10000).ceil() * 10000).toDouble();
     }
-    return ((maxVal / base).ceil()) * base.toDouble();
   }
 
   @override
   Widget build(BuildContext context) {
     final groupedKeys = groupedData.keys.toList();
+    final textScale = MediaQuery.textScaleFactorOf(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,9 +47,12 @@ class TimeToggleBarChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              "By ${selectedGroup.name[0].toUpperCase()}${selectedGroup.name.substring(1)}",
-              style: Theme.of(context).textTheme.titleMedium,
+            Flexible(
+              child: Text(
+                "By ${selectedGroup.name[0].toUpperCase()}${selectedGroup.name.substring(1)}",
+                style: Theme.of(context).textTheme.titleMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             ToggleButtons(
               isSelected: [
@@ -71,14 +80,15 @@ class TimeToggleBarChart extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 250,
+          height: 250 * textScale,
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: groupedKeys.length * 85,
+              width: groupedKeys.length * 85.0 * textScale,
               child: BarChart(
                 BarChartData(
                   maxY: _getMaxY(groupedData),
+                  minY: 0,
                   alignment: BarChartAlignment.spaceAround,
                   barTouchData: BarTouchData(
                     enabled: true,
@@ -101,22 +111,42 @@ class TimeToggleBarChart extends StatelessWidget {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 60,
+                        reservedSize: 50 * textScale,
+                        getTitlesWidget: (value, meta) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 4),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                _formatNumber(value),
+                                style: TextStyle(fontSize: 10 * textScale),
+                                textAlign: TextAlign.right,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 40,
+                        reservedSize: 40 * textScale,
                         getTitlesWidget: (value, _) {
                           final index = value.toInt();
                           if (index < groupedKeys.length) {
                             return Padding(
                               padding: const EdgeInsets.only(top: 6),
-                              child: Text(
-                                groupedKeys[index],
-                                style: const TextStyle(fontSize: 10),
-                                textAlign: TextAlign.center,
+                              child: SizedBox(
+                                width: 60 * textScale,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    groupedKeys[index],
+                                    style: TextStyle(fontSize: 10 * textScale),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                               ),
                             );
                           }
@@ -141,7 +171,7 @@ class TimeToggleBarChart extends StatelessWidget {
                           barRods: [
                             BarChartRodData(
                               toY: value,
-                              width: 18,
+                              width: 18 * textScale,
                               color: const Color(0xFF676F8A),
                               borderRadius: BorderRadius.circular(4),
                             ),

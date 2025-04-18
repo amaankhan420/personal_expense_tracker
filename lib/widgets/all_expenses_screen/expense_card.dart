@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants/categories.dart';
 import '../../models/expense_model.dart';
+import '../../providers/categories_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../screens/edit_expense_screen.dart';
 
@@ -124,7 +124,7 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
       updatedExpense,
     );
 
-    Navigator.pop(context); // Close dialog
+    Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Expense updated!'),
@@ -136,6 +136,8 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final categories = categoryProvider.categories;
     return AlertDialog(
       title: const Text('Edit Expense'),
       content: SingleChildScrollView(
@@ -153,10 +155,11 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
               decoration: const InputDecoration(labelText: 'Amount'),
             ),
             const SizedBox(height: 8),
+
             DropdownButtonFormField<String>(
               value: _selectedCategory,
               items:
-                  expenseCategories
+                  categories
                       .map(
                         (cat) => DropdownMenuItem(value: cat, child: Text(cat)),
                       )

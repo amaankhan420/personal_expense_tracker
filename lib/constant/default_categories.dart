@@ -1,11 +1,11 @@
-const List<String> expenseCategories = [
+final List<String> defaultCategories = [
   'Food',
   'Transport',
-  'Shopping',
+  'Education',
   'Bills',
   'Entertainment',
   'Health',
-  'Education',
   'Taxes',
+  'Shopping',
   'Other',
 ];

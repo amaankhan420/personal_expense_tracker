@@ -34,7 +34,7 @@ class CategoryPieChart extends StatelessWidget {
                     return PieChartSectionData(
                       value: e.value,
                       title: showTitle ? '${e.key}\n$percent%' : '',
-                      radius: 60,
+                      radius: 70,
                       titleStyle: TextStyle(
                         fontSize: 11,
                         color: defaultTextColor,

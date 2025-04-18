@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:personal_expense_tracker/providers/theme_provider.dart';
+import 'package:personal_expense_tracker/providers/categories_provider.dart';
+import 'package:personal_expense_tracker/providers/user_settings_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/budget_provider.dart';
@@ -26,9 +27,10 @@ class ExpenseTrackerApp extends StatelessWidget {
         ),
 
         ChangeNotifierProvider(create: (_) => BudgetProvider()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => UserSettingsProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
       ],
-      child: Consumer<ThemeProvider>(
+      child: Consumer<UserSettingsProvider>(
         builder: (context, themeProvider, child) {
           return MaterialApp(
             title: 'Expense Tracker',

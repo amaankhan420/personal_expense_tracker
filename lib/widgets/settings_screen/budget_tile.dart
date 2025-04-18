@@ -12,6 +12,7 @@ class BudgetTile extends StatelessWidget {
     final budgetProvider = Provider.of<BudgetProvider>(context);
 
     return ListTile(
+      leading: const Icon(Icons.monetization_on),
       title: const Text("Set Monthly Budget"),
       subtitle: Text(
         budgetProvider.limit == 0

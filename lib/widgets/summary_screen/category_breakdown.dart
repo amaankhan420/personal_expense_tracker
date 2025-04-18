@@ -32,11 +32,28 @@ class CategoryBreakdown extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(entry.key, style: const TextStyle(fontSize: 15)),
-                Text(
-                  '₹${entry.value.toStringAsFixed(2)}',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                Flexible(
+                  flex: 2,
+                  child: Text(
+                    entry.key,
+                    style: const TextStyle(fontSize: 15),
+                    softWrap: true,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Text(
+                    '₹${entry.value.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    softWrap: true,
+                    textAlign: TextAlign.right,
+                  ),
                 ),
               ],
             ),
