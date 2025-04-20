@@ -46,7 +46,9 @@ class BudgetSharedPref {
         await prefs.remove(_notifiedKey);
       }
     } catch (e, stack) {
-      debugPrint('Error setting notification setting: $e\n$stack');
+      if (kDebugMode) {
+        debugPrint('Error setting notification setting: $e\n$stack');
+      }
     }
   }
 
@@ -57,7 +59,9 @@ class BudgetSharedPref {
       debugPrint('Loaded notification setting from prefs: $value');
       return BudgetNotificationSetting.values.byName(value ?? 'always');
     } catch (e, stack) {
-      debugPrint('Error getting notification setting: $e\n$stack');
+      if (kDebugMode) {
+        debugPrint('Error getting notification setting: $e\n$stack');
+      }
       return BudgetNotificationSetting.never;
     }
   }
@@ -67,7 +71,9 @@ class BudgetSharedPref {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(_notifiedKey) ?? false;
     } catch (e, stack) {
-      debugPrint('Error checking notification status: $e\n$stack');
+      if (kDebugMode) {
+        debugPrint('Error checking notification status: $e\n$stack');
+      }
       return false;
     }
   }
@@ -77,7 +83,9 @@ class BudgetSharedPref {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_notifiedKey, true);
     } catch (e, stack) {
-      debugPrint('Error marking as notified: $e\n$stack');
+      if (kDebugMode) {
+        debugPrint('Error marking as notified: $e\n$stack');
+      }
     }
   }
 
@@ -86,7 +94,9 @@ class BudgetSharedPref {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_notifiedKey);
     } catch (e, stack) {
-      debugPrint('Error resetting notification status: $e\n$stack');
+      if (kDebugMode) {
+        debugPrint('Error resetting notification status: $e\n$stack');
+      }
     }
   }
 }

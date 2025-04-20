@@ -49,41 +49,51 @@ class ExpenseFormState extends State<ExpenseForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          ExpenseInputFields(
-            titleController: _titleController,
-            amountController: _amountController,
-            selectedCategory: _selectedCategory,
-            selectedDate: _selectedDate,
-            onCategoryChanged: (newValue) {
-              setState(() {
-                _selectedCategory = newValue;
-              });
-            },
-            onPickDate: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: _selectedDate,
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (pickedDate != null) {
-                setState(() {
-                  _selectedDate = pickedDate;
-                });
-              }
-            },
+    return LayoutBuilder(
+      builder:
+          (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      ExpenseInputFields(
+                        titleController: _titleController,
+                        amountController: _amountController,
+                        selectedCategory: _selectedCategory,
+                        selectedDate: _selectedDate,
+                        onCategoryChanged: (newValue) {
+                          setState(() {
+                            _selectedCategory = newValue;
+                          });
+                        },
+                        onPickDate: () async {
+                          final pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDate,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (pickedDate != null) {
+                            setState(() {
+                              _selectedDate = pickedDate;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _submitForm,
+                        child: const Text('Add Expense'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _submitForm,
-            child: const Text('Add Expense'),
-          ),
-        ],
-      ),
     );
   }
 }

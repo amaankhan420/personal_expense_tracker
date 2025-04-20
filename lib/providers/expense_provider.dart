@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,11 @@ class ExpenseProvider with ChangeNotifier {
       _expenses = await ExpenseDB().getAllExpenses();
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error in fetchExpenses: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to fetch expenses",
+      );
     }
   }
 
@@ -24,21 +29,28 @@ class ExpenseProvider with ChangeNotifier {
       _expenses.add(expense.copyWith(id: id));
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error in addExpense: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to add expenses",
+      );
     }
   }
 
   Future<void> updateExpense(String id, Expense updatedExpense) async {
     try {
-      int updated = await ExpenseDB().updateExpense(updatedExpense);
-      debugPrint("$updated affected");
+      await ExpenseDB().updateExpense(updatedExpense);
       final index = _expenses.indexWhere((e) => e.id == id);
       if (index != -1) {
         _expenses = [..._expenses]..[index] = updatedExpense;
         notifyListeners();
       }
     } catch (e, stack) {
-      debugPrint('Error in updateExpense: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to update expenses",
+      );
     }
   }
 
@@ -48,7 +60,11 @@ class ExpenseProvider with ChangeNotifier {
       _expenses.removeWhere((e) => e.id == id);
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error in deleteExpense: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to delete expenses",
+      );
     }
   }
 
@@ -58,7 +74,11 @@ class ExpenseProvider with ChangeNotifier {
           .where((e) => e.category == category)
           .fold(0.0, (sum, e) => sum + e.amount);
     } catch (e, stack) {
-      debugPrint('Error in getTotalByCategory: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get total by category",
+      );
       return 0.0;
     }
   }
@@ -67,7 +87,11 @@ class ExpenseProvider with ChangeNotifier {
     try {
       return _expenses.fold(0.0, (sum, e) => sum + e.amount);
     } catch (e, stack) {
-      debugPrint('Error in totalSpent: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get total spent",
+      );
       return 0.0;
     }
   }
@@ -76,7 +100,11 @@ class ExpenseProvider with ChangeNotifier {
     try {
       return _expenses.map((e) => e.category).toSet().toList();
     } catch (e, stack) {
-      debugPrint('Error in usedCategories: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get used categories",
+      );
       return [];
     }
   }
@@ -89,7 +117,11 @@ class ExpenseProvider with ChangeNotifier {
       }
       return totals;
     } catch (e, stack) {
-      debugPrint('Error in categoryTotals: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get category total",
+      );
       return {};
     }
   }
@@ -105,7 +137,11 @@ class ExpenseProvider with ChangeNotifier {
         totals.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
       );
     } catch (e, stack) {
-      debugPrint('Error in dailyTotals: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get daily totals",
+      );
       return {};
     }
   }
@@ -122,7 +158,11 @@ class ExpenseProvider with ChangeNotifier {
 
       return total;
     } catch (e, stack) {
-      debugPrint('Error in monthlySpent: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get monthly spent",
+      );
       return 0.0;
     }
   }
@@ -141,7 +181,11 @@ class ExpenseProvider with ChangeNotifier {
 
       return monthlyTotals;
     } catch (e, stack) {
-      debugPrint('Error in getMonthlyCategoryTotals: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get monthly category totals",
+      );
       return {};
     }
   }

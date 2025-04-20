@@ -17,8 +17,10 @@ class ExpenseDB {
       if (_db != null) return _db!;
       _db = await _initDB();
       return _db!;
-    } catch (e, stack) {
-      debugPrint('Error in opening DB: $e\n$stack');
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error getting database: $e');
+      }
       rethrow;
     }
   }
@@ -41,8 +43,10 @@ class ExpenseDB {
           ''');
         },
       );
-    } catch (e, stack) {
-      debugPrint('Error initializing DB: $e\n$stack');
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error initializing database: $e');
+      }
       rethrow;
     }
   }
@@ -51,8 +55,10 @@ class ExpenseDB {
     try {
       final db = await database;
       return await db.insert('expenses', expense.toMap());
-    } catch (e, stack) {
-      debugPrint('Error inserting expense: $e\n$stack');
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error inserting expense: $e');
+      }
       return -1;
     }
   }
@@ -66,8 +72,10 @@ class ExpenseDB {
         where: 'id = ?',
         whereArgs: [expense.id],
       );
-    } catch (e, stack) {
-      debugPrint('Error updating expenses: $e\n$stack');
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error updating expense: $e');
+      }
       return -1;
     }
   }
@@ -77,8 +85,10 @@ class ExpenseDB {
       final db = await database;
       final res = await db.query('expenses', orderBy: 'date DESC');
       return res.map((e) => Expense.fromMap(e)).toList();
-    } catch (e, stack) {
-      debugPrint('Error fetching expenses: $e\n$stack');
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error fetching expenses: $e');
+      }
       return [];
     }
   }
@@ -87,8 +97,10 @@ class ExpenseDB {
     try {
       final db = await database;
       return await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
-    } catch (e, stack) {
-      debugPrint('Error deleting expense with id $id: $e\n$stack');
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error deleting expense: $e');
+      }
       return 0;
     }
   }

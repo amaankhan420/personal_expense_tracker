@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/expense_model.dart';
+import '../providers/budget_provider.dart';
 import '../providers/expense_provider.dart';
+import '../widgets/common/budget_notifier.dart';
 import '../widgets/common/expense_input_fields.dart';
 
 class EditExpenseScreen extends StatefulWidget {
@@ -49,17 +51,44 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
       date: _selectedDate,
     );
 
-    await context.read<ExpenseProvider>().updateExpense(
-      widget.expense.id.toString(),
-      updated,
-    );
+    try {
+      await context.read<ExpenseProvider>().updateExpense(
+        widget.expense.id.toString(),
+        updated,
+      );
 
-    await context.read<ExpenseProvider>().fetchExpenses();
+      await context.read<ExpenseProvider>().fetchExpenses();
 
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Expense updated!')));
+      final expenseProvider = context.read<ExpenseProvider>();
+      final budgetProvider = context.read<BudgetProvider>();
+
+      final monthlySpent = expenseProvider.monthlySpent;
+      final shouldNotify = await budgetProvider.shouldNotify(
+        expenseDate: _selectedDate,
+        monthlySpent: monthlySpent,
+      );
+
+      final monthlyBudget = budgetProvider.monthlyBudget;
+
+      if (shouldNotify && (monthlyBudget != null && monthlyBudget > 0)) {
+        await BudgetNotifier.showBudgetNotification(
+          context,
+          monthlySpent,
+          monthlyBudget,
+        );
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Expense updated!')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Something went wrong.')));
+    }
   }
 
   void _pickDate() async {

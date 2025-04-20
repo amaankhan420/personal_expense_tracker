@@ -27,6 +27,7 @@ lib/
 ├── providers/ # State management using Provider
 ├── screens/ # Main UI screens
 ├── widgets/ # Reusable UI components
+├── firebase_options.dart # firebase file
 └── main.dart # App entry point
 
 ---
@@ -37,6 +38,7 @@ lib/
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.8
   provider: ^6.1.2
   sqflite: ^2.3.2
   shared_preferences: ^2.5.3
@@ -44,6 +46,8 @@ dependencies:
   path: ^1.9.0
   intl: ^0.19.0
   fl_chart: ^0.65.0
+  firebase_core: ^3.13.0
+  firebase_crashlytics: ^4.3.5
 ```
 
 ---
@@ -59,6 +63,16 @@ dependencies:
 
 3. Run the app:
    flutter run
+
+---
+
+## Firebase Setup
+
+1. Download `google-services.json` and `GoogleService-Info.plist` from Firebase Console.
+2. Place them in:
+    - `android/app/google-services.json`
+    - `ios/Runner/GoogleService-Info.plist`
+3. Run `flutterfire configure` to generate `firebase_options.dart`.
 
 ---
 

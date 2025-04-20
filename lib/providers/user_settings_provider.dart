@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 import '../data/shared_pref/user_settings.dart';
@@ -14,13 +15,29 @@ class UserSettingsProvider extends ChangeNotifier {
   }
 
   void toggleTheme() async {
-    _isDarkMode = !_isDarkMode;
-    await UserSettings.saveThemePreference(_isDarkMode);
-    notifyListeners();
+    try {
+      _isDarkMode = !_isDarkMode;
+      await UserSettings.saveThemePreference(_isDarkMode);
+      notifyListeners();
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Error toggling theme',
+      );
+    }
   }
 
   Future<void> _loadThemePreference() async {
-    _isDarkMode = await UserSettings.getThemePreference();
-    notifyListeners();
+    try {
+      _isDarkMode = await UserSettings.getThemePreference();
+      notifyListeners();
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Error loading theme preference',
+      );
+    }
   }
 }

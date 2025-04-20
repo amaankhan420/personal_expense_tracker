@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
@@ -24,7 +25,11 @@ class BudgetProvider with ChangeNotifier {
       _monthlyBudget = budget;
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error in fetchBudget: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to fetch budget",
+      );
     }
   }
 
@@ -34,7 +39,11 @@ class BudgetProvider with ChangeNotifier {
           await BudgetSharedPref().getOverBudgetNotification();
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error fetching notification setting: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to set fetch notification setting",
+      );
     }
   }
 
@@ -45,7 +54,11 @@ class BudgetProvider with ChangeNotifier {
       _monthlyBudget = limit;
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error in setBudget: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to set budget",
+      );
     }
   }
 
@@ -55,7 +68,11 @@ class BudgetProvider with ChangeNotifier {
       _notificationSetting = setting;
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error setting notification setting: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to set notification setting",
+      );
     }
   }
 
@@ -65,7 +82,11 @@ class BudgetProvider with ChangeNotifier {
       _monthlyBudget = null;
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error in deleteBudget: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Failed to delete budget",
+      );
     }
   }
 
@@ -73,7 +94,11 @@ class BudgetProvider with ChangeNotifier {
     try {
       return _monthlyBudget ?? 0.0;
     } catch (e, stack) {
-      debugPrint('Error in limit getter: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to get limit",
+      );
       return 0.0;
     }
   }
@@ -82,7 +107,11 @@ class BudgetProvider with ChangeNotifier {
     try {
       return limit - totalExpense;
     } catch (e, stack) {
-      debugPrint('Error in remaining: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to find remaining budget",
+      );
       return 0.0;
     }
   }
@@ -91,15 +120,39 @@ class BudgetProvider with ChangeNotifier {
     try {
       return totalExpense > limit;
     } catch (e, stack) {
-      debugPrint('Error in isOverBudget: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to find if user is over budget",
+      );
       return false;
     }
   }
 
-  Future<bool> shouldNotify() async {
+  Future<bool> shouldNotify({
+    DateTime? expenseDate,
+    required double monthlySpent,
+  }) async {
     try {
       final sharedPref = BudgetSharedPref();
       final setting = await sharedPref.getOverBudgetNotification();
+
+      if (_monthlyBudget == null || _monthlyBudget! <= 0) {
+        return false;
+      }
+
+      if (expenseDate != null) {
+        final now = DateTime.now();
+        final isCurrentMonth =
+            expenseDate.year == now.year && expenseDate.month == now.month;
+        if (!isCurrentMonth) {
+          return false;
+        }
+      }
+
+      if (!isOverBudget(monthlySpent)) {
+        return false;
+      }
 
       switch (setting) {
         case BudgetNotificationSetting.never:
@@ -115,7 +168,11 @@ class BudgetProvider with ChangeNotifier {
           return false;
       }
     } catch (e, stack) {
-      debugPrint('Error in shouldNotify: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to determine if notification should be sent",
+      );
       return false;
     }
   }
@@ -125,7 +182,11 @@ class BudgetProvider with ChangeNotifier {
       await BudgetSharedPref().resetNotificationStatus();
       notifyListeners();
     } catch (e, stack) {
-      debugPrint('Error resetting notification status: $e\n$stack');
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: "Unable to reset notification status",
+      );
     }
   }
 }

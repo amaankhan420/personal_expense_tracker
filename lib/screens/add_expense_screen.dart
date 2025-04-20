@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +7,7 @@ import '../providers/budget_provider.dart';
 import '../providers/categories_provider.dart';
 import '../providers/expense_provider.dart';
 import '../widgets/add_expense_screen/expense_form.dart';
+import '../widgets/common/budget_notifier.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -16,7 +18,6 @@ class AddExpenseScreen extends StatefulWidget {
 
 class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<ExpenseFormState>();
-  bool _hasShownNotification = false;
 
   @override
   Widget build(BuildContext context) {
@@ -63,19 +64,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
             if (!mounted) return;
 
-            final shouldNotify = await budgetProvider.shouldNotify();
+            final monthlySpent = expenseProvider.monthlySpent;
+            final shouldNotify = await budgetProvider.shouldNotify(
+              expenseDate: date,
+              monthlySpent: monthlySpent,
+            );
+            final monthlyBudget = budgetProvider.monthlyBudget;
 
-            if (shouldNotify) {
-              final monthlySpent = expenseProvider.monthlySpent;
-
-              await _showBudgetNotification(
+            if (shouldNotify && (monthlyBudget != null && monthlyBudget > 0)) {
+              await BudgetNotifier.showBudgetNotification(
                 context,
                 monthlySpent,
-                budgetProvider.monthlyBudget ?? 0.0,
+                monthlyBudget,
               );
             }
           } catch (e) {
-            debugPrint('Error while saving: $e');
+            if (kDebugMode) {
+              debugPrint('Error while saving: $e');
+            }
+
             if (!mounted) return;
 
             scaffoldMessenger.showSnackBar(
@@ -91,37 +98,5 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         },
       ),
     );
-  }
-
-  Future<void> _showBudgetNotification(
-    BuildContext context,
-    double monthlySpent,
-    double monthlyBudget,
-  ) async {
-    if (_hasShownNotification) return;
-    _hasShownNotification = true;
-
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (!mounted) return;
-
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Budget Exceeded'),
-            content: Text(
-              'You\'ve spent ₹${monthlySpent.toStringAsFixed(2)} this month.\n'
-              'Your budget is ₹${monthlyBudget.toStringAsFixed(2)}.',
-            ),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-    ).then((_) {
-      _hasShownNotification = false;
-    });
   }
 }

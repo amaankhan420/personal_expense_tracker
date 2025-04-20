@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 import '../data/shared_pref/categories.dart';
@@ -12,24 +13,56 @@ class CategoryProvider extends ChangeNotifier {
   }
 
   Future<void> loadCategories() async {
-    _categories = await Categories.getCategories();
-    notifyListeners();
+    try {
+      _categories = await Categories.getCategories();
+      notifyListeners();
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Error loading categories',
+      );
+    }
   }
 
   Future<void> addCategory(String newCategory) async {
-    _categories.add(newCategory);
-    await Categories.saveCategories(_categories);
-    notifyListeners();
+    try {
+      _categories.add(newCategory);
+      await Categories.saveCategories(_categories);
+      notifyListeners();
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Error adding category',
+      );
+    }
   }
 
   Future<void> removeCategory(String category) async {
-    _categories.remove(category);
-    await Categories.saveCategories(_categories);
-    notifyListeners();
+    try {
+      _categories.remove(category);
+      await Categories.saveCategories(_categories);
+      notifyListeners();
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Error removing category',
+      );
+    }
   }
 
   Future<void> resetToDefault() async {
-    _categories = await Categories.resetToDefault();
-    notifyListeners();
+    try {
+      _categories = await Categories.resetToDefault();
+      notifyListeners();
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stack,
+        reason: 'Error resetting to default',
+      );
+    }
   }
 }

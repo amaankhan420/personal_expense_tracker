@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSettings {
@@ -9,7 +9,9 @@ class UserSettings {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_themeKey, isDarkMode);
     } catch (e, stack) {
-      debugPrint('Error saving theme preference: $e$stack');
+      if (kDebugMode) {
+        debugPrint('Error saving theme preference: $e$stack');
+      }
     }
   }
 
@@ -18,7 +20,9 @@ class UserSettings {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(_themeKey) ?? false;
     } catch (e, stack) {
-      debugPrint('Error getting theme preference: $e$stack');
+      if (kDebugMode) {
+        debugPrint('Error getting theme preference: $e$stack');
+      }
       return false;
     }
   }
